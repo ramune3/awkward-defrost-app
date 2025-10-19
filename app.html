@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>気まずさ検出ミーティングシミュレータ</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; }
+    #status { font-size: 1.2em; margin-top: 1em; }
+    #timer { font-weight: bold; }
+    .btn { padding: 0.5em 1em; margin-right: 1em; }
+  </style>
+</head>
+<body>
+  <h1>ミーティング気まずさ検出</h1>
+  <p>沈黙やリアクション減による気まずさ判定をシミュレーションします。</p>
+  <button id="talkBtn" class="btn">誰か発言する</button>
+  <button id="reactBtn" class="btn">リアクション（うなずき・笑顔）</button>
+  <button id="resetBtn" class="btn">リセット</button>
+  <div id="status">沈黙秒数: <span id="timer">0</span></div>
+  <div id="result" style="margin-top:1em; color: red;"></div>
+
+  <script>
+    let silenceSeconds = 0;
+    let reactCount = 0;
+    let timerId;
+    let statusElem = document.getElementById("status");
+    let timerElem = document.getElementById("timer");
+    let resultElem = document.getElementById("result");
+
+    function reset() {
+      silenceSeconds = 0;
+      reactCount = 0;
+      timerElem.textContent = silenceSeconds;
+      resultElem.textContent = "";
+      clearInterval(timerId);
+      timerId = setInterval(() => {
+        silenceSeconds++;
+        timerElem.textContent = silenceSeconds;
+        checkAwkwardness();
+      }, 1000);
+    }
+
+    function checkAwkwardness() {
+      if (silenceSeconds > 15 && reactCount < 2) {
+        resultElem.textContent = "気まずい雰囲気を検出しました。話題を変えましょう！";
+      } else if (silenceSeconds > 20) {
+        resultElem.textContent = "かなり気まずい状態です。誰か会話を始めましょう。";
+      } else {
+        resultElem.textContent = "";
+      }
+    }
+
+    document.getElementById("talkBtn").onclick = () => {
+      silenceSeconds = 0;
+      reactCount = 0;
+      timerElem.textContent = silenceSeconds;
+      resultElem.textContent = "";
+    };
+
+    document.getElementById("reactBtn").onclick = () => {
+      reactCount++;
+      checkAwkwardness();
+    };
+
+    document.getElementById("resetBtn").onclick = reset;
+
+    reset(); // 初期化
+  </script>
+</body>
+</html>
